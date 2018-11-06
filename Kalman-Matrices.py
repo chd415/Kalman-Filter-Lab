@@ -148,20 +148,22 @@ def kalman_filter(x, P):
     for n in range(len(measurements)):
         Z = maxtrix([measurements[n]])
         # measurement update
-        mul_temp = __mul__(H,x)
-        y = __sub__(Z,mul_temp)
-        H_trans = transpose(H)
-        mult_temp = __mul__(H,P,H_trans)
-        S = __add__(mult_temp,R)
-        S_invers = inverse(S)
-        K = __mul__(P,H_trans,S_invers)
+        mul_temp = H * x
+        y = Z - mul_temp 
+        H_trans = H.transpose()
+        mult_temp = H * P * H_trans
+        S = mult_temp + R
+        S_invers = S.inverse()
+        K = P * H_trans * S_invers
+        KY = K * y
+        x = x + KY
+        KH = K * H
+        sub_temp = I - KH
+        P = sub_temp * P
         
         # prediction
-        KY = __mul__(K,y)
-        x = __add__(x,KY)
-        KH = __mul__(K,H)
-        sub_temp = __sub__(T,KH)
-        P = __mul__(sub_temp,P)
+        x = F * x + u
+        P = F * P * F.transpose()
         
     return x,P
 
